@@ -1,5 +1,5 @@
 -- ==========================================
--- MEGA MENU v21.18: FULL SCRIPT (CLEAN ESP)
+-- MEGA MENU v21.18: FULL SCRIPT (CLEAN ESP + QUIZ FIX)
 -- ==========================================
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -10,7 +10,7 @@ local RunService = game:GetService("RunService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local pGui = LocalPlayer:WaitForChild("PlayerGui")
 
-print("[ScriptHub] Запуск v21.18 (CLEAN ESP)")
+print("[ScriptHub] Запуск v21.18 (CLEAN ESP + QUIZ FIX)")
 
 -- === ФЛАГИ ===
 local isESP = false
@@ -315,7 +315,7 @@ local function createInfoTable()
         pT.BackgroundColor3 = Color3.fromRGB(50,80,150); pT.TextColor3 = Color3.fromRGB(255,255,255)
         qT.BackgroundColor3 = Color3.fromRGB(40,40,50); qT.TextColor3 = Color3.fromRGB(200,200,200)
     end)
-    
+
     qAutoBtn.MouseButton1Click:Connect(function()
         isInfoAutoQuiz = not isInfoAutoQuiz
         if isInfoAutoQuiz then
@@ -346,7 +346,7 @@ local function createInfoTable()
                         end
                     end
                 end
-                
+
                 if aq and aq ~= "" and aq ~= lastQ then
                     lastQ = aq
                     for _, c in ipairs(qC:GetChildren()) do
@@ -357,14 +357,18 @@ local function createInfoTable()
                     qLbl.BackgroundTransparency = 1; qLbl.Text = "❓ "..aq
                     qLbl.TextColor3 = Color3.fromRGB(255,255,100); qLbl.Font = Enum.Font.GothamBold
                     qLbl.TextSize = 13; qLbl.TextWrapped = true; qLbl.TextXAlignment = Enum.TextXAlignment.Left
-                    
+
                     if ao then
                         for i = 1, 4 do
                             local n = ao:FindFirstChild("Normal"..i)
                             if n and n.Visible then
                                 local rb = n:FindFirstChild("TextButton")
                                 local lb = rb and rb:FindFirstChild("TextLabel")
-                                local ans = lb and lb.Text or "?"
+                                -- FIX: у типа 4Buttons TextLabel — сосед TextButton, а не ребёнок
+                                if not lb or lb.Text == "" then
+                                    lb = n:FindFirstChild("TextLabel")
+                                end
+                                local ans = (lb and lb.Text ~= "" and lb.Text) or "?"
                                 local ob = Instance.new("TextButton", qC)
                                 ob.Size = UDim2.new(1,-10,0,32); ob.BackgroundColor3 = Color3.fromRGB(40,60,90)
                                 ob.Text = "▸ "..ans; ob.TextColor3 = Color3.fromRGB(255,255,255)
@@ -374,7 +378,7 @@ local function createInfoTable()
                                 ob.MouseButton1Click:Connect(function() clickGui(rb) end)
                             end
                         end
-                        
+
                         if isInfoAutoQuiz then
                             task.spawn(function()
                                 task.wait(0.5)
@@ -459,7 +463,7 @@ local function createInfoTable()
                             if cm and cm:FindFirstChild("ClassId") then hasClass = cm.ClassId.Value ~= "" end
                         end
                     end)
-                    
+
                     local inviteStatus = "✅ Можно"
                     local inviteColor = Color3.fromRGB(100, 255, 100)
                     if p == LocalPlayer then
@@ -472,7 +476,7 @@ local function createInfoTable()
                         inviteStatus = "❌ Новичок"
                         inviteColor = Color3.fromRGB(255, 100, 100)
                     end
-                    
+
                     local row = Instance.new("Frame", pC)
                     row.Size = UDim2.new(1,-10,0,96)
                     row.BackgroundColor3 = p == LocalPlayer and Color3.fromRGB(40,70,40) or Color3.fromRGB(28,28,38)
@@ -511,7 +515,7 @@ RunService.RenderStepped:Connect(function()
     if not isAutoArchery then return end
     if isTyping() then return end
     if tick() - lastArchShot < 0.5 then return end
-    
+
     pcall(function()
         local sports = pGui:FindFirstChild("SportsExam")
         local arch = sports and sports:FindFirstChild("ArcheryGui")
@@ -520,12 +524,12 @@ RunService.RenderStepped:Connect(function()
             local bar = holder and holder:FindFirstChild("Bar")
             local marker = bar and bar:FindFirstChild("Marker")
             local centerZone = bar and bar:FindFirstChild("CenterZone")
-            
+
             if marker and centerZone then
                 local mCenter = marker.AbsolutePosition.X + (marker.AbsoluteSize.X / 2)
                 local czLeft = centerZone.AbsolutePosition.X
                 local czRight = centerZone.AbsolutePosition.X + centerZone.AbsoluteSize.X
-                
+
                 if mCenter >= czLeft and mCenter <= czRight then
                     lastArchShot = tick()
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
@@ -609,4 +613,4 @@ UnloadBtn.MouseButton1Click:Connect(function()
     if ScreenGui then ScreenGui:Destroy() end
 end)
 
-print("[ScriptHub] ✅ v21.18 FULL SCRIPT (Clean ESP) загружено.")
+print("[ScriptHub] ✅ v21.18 FULL SCRIPT (Clean ESP + Quiz Fix) загружено.")
